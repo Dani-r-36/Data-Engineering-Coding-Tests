@@ -11,7 +11,11 @@ Run as normal, but will get invalid log_level print line for any log_line which 
 
 ### Task 2
 
-Run as normal, where you will get th
+Run as normal, where you will get the CSV data formatted and the required lump data from API to variables people_dict, details, respectively
+
+### Task 3
+
+Run as normal, with sum_current_time taking numbers between : as full but sum_current_time_remove getting sum of each digit in the timestamp
 
 ## Problems with tasks
 
