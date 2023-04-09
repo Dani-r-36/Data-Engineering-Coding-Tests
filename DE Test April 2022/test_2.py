@@ -69,6 +69,55 @@
 # - the dx_number (if available) of the nearest court of the right type
 # - the distance to the nearest court of the right type
 
+#mysteps 
+#        - read csv file and format 
+#        - access api and get required details - test if i got what i want 
+#        - get required details from api
+#        - 
+from urllib.request import urlopen
+import json
+import os
+import csv
+URL = "https://courttribunalfinder.service.gov.uk/search/results.json"
+CSV = "./people.csv"
+
+def open_csv():
+    data_list = []
+    if os.path.exists(CSV):
+     with open(CSV) as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        return list(csv_reader)
+    else:
+        raise Exception ("Invaild location for CSV")
+
+def get_csv_data():
+    csv_list = open_csv()
+    people_dict={}
+    for data in csv_list[1:]:
+        if len(data) != 3:
+            continue
+        people_dict['name'] = data[0]
+        people_dict['postcode'] = data[1]
+        people_dict['court'] = data[2]
+        court_details = api_data(people_dict['postcode'])
+    return people_dict, court_details
+
+def people_data(people_dict, court_details):
+    for courts in court_details:
+        if people_dict['court'] in courts['types']:
+            print(courts)
+
+def api_data(postcode):
+    try:
+        response = urlopen(f"{URL}?postcode={postcode}")
+        data_json = json.loads(response.read())
+        return data_json
+    except Exception as err:
+        print(err)
+        return("Invalid postcode")
+
+
+
 if __name__ == "__main__":
-    # [TODO]: write your answer here
-    pass
+    people_dict, details = get_csv_data()
+    people_data(people_dict, details)

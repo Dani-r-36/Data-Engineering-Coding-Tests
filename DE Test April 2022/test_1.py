@@ -5,12 +5,32 @@
 # There's no perfect way to do this: just decide what you think is reasonable to get
 # the test to pass. The only thing you are not allowed to do is filter out log lines
 # based on the exact row numbers you want to remove.
-def is_log_line(line):
-    """Takes a log line and returns True if it is a valid log line and returns nothing
-    if it is not.
-    """
-    return True
+from datetime import datetime
+import time
 
+INFO ="INFO"
+TRACE = "TRACE"
+WARNING = "WARNING"
+
+def is_log_line(line):
+    row = line.split()
+    if len(row) > 3:
+        formated_row = formating(row)
+        if len(formated_row) == 3:
+            return True
+    return False
+
+def formating(row):
+    formated_row = []
+    date_string = f"{row[0]} {row[1]}"
+    datetime_object = datetime.strptime(date_string, '%d/%m/%y %H:%M:%S')
+    formated_datetime = datetime_object.strftime('%d/%m/%y %H:%M:%S')
+    log_level = row[2]
+    message = " ".join(row[3:])
+    formated_row.append(formated_datetime)
+    formated_row.append(log_level)
+    formated_row.append(message)
+    return formated_row
 
 # [TODO]: step 2
 # Update the get_dict function below so it converts a line of the logs into a
@@ -18,10 +38,20 @@ def is_log_line(line):
 # levels are `INFO`, `TRACE`, and `WARNING`. See lines 67 to 71 for how we expect the
 # results to look.
 def get_dict(line):
-    """Takes a log line and returns a dict with
-    `timestamp`, `log_level`, `message` keys
-    """
-    pass
+    row = line.split()
+    date_string = f"{row[0]} {row[1]}"
+    datetime_object = datetime.strptime(date_string, '%d/%m/%y %H:%M:%S')
+    formated_datetime = datetime_object.strftime('%d/%m/%y %H:%M:%S')
+    log_level = row[2]
+    message = " ".join(row[3:])
+    if log_level != INFO or log_level != TRACE or log_level != WARNING:
+        print("Invalid log_level")
+    data = {
+            "timestamp": formated_datetime,
+            "log_level": log_level,
+            "message": message,
+        }
+    return data
 
 
 # YOU DON'T NEED TO CHANGE ANYTHING BELOW THIS LINE
@@ -53,7 +83,6 @@ if __name__ == "__main__":
         with open("tests/step1.log") as f:
             test_lines = f.readlines()
         actual_out = list(log_parser_step_1("sample.log"))
-
         if actual_out == test_lines:
             print("STEP 1 SUCCESS")
         else:
