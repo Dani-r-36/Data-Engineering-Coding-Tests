@@ -11,22 +11,8 @@ Run as normal, but will get invalid log_level print line for any log_line which 
 
 ### Task 2
 
-Run as normal, where you will get the CSV data formatted and the required lump data from API to variables people_dict, details, respectively
+Run as normal, where you will get the each persons, from CSV file, nearest requested court
 
 ### Task 3
 
 Run as normal, with sum_current_time taking numbers between : as full but sum_current_time_remove getting sum of each digit in the timestamp
-
-## Problems with tasks
-
-### Test 1
-
-With this test 1 did not have enough time to finish implementing my new function which formats the data and carry out last pytest
-
-### Test 2
-
-with test 2 i did not enough time to go through the api data for each person to get required data out and present in presentable manor
-
-### Test 3
-
-Was not sure if numbers should be taken in single digit form or as they are so completed task for both instances

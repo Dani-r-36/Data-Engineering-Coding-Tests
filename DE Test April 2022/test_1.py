@@ -13,37 +13,36 @@ TRACE = "TRACE"
 WARNING = "WARNING"
 
 def is_log_line(line):
+    """sorts data and checks if required data is in list"""
+    formated_row =[]
     row = line.split()
     if len(row) > 3:
-        formated_row = formating(row)
-        if len(formated_row) == 3:
+        formated_datetime, log_level, message = formating(row)
+        formated_row.append(formated_datetime)
+        formated_row.append(log_level)
+        formated_row.append(message)
+        if len(formated_row) == 3 and formated_datetime != "":
             return True
     return False
 
 def formating(row):
-    formated_row = []
+    """sorts data line to respective variables"""
+    formated_datetime = ""
     date_string = f"{row[0]} {row[1]}"
-    datetime_object = datetime.strptime(date_string, '%d/%m/%y %H:%M:%S')
-    formated_datetime = datetime_object.strftime('%d/%m/%y %H:%M:%S')
+    try:
+        datetime_object = datetime.strptime(date_string, '%d/%m/%y %H:%M:%S')
+        formated_datetime = datetime_object.strftime('%d/%m/%y %H:%M:%S')
+    except Exception as err:
+        print(err)
+        print("Not in datetime format")
     log_level = row[2]
     message = " ".join(row[3:])
-    formated_row.append(formated_datetime)
-    formated_row.append(log_level)
-    formated_row.append(message)
-    return formated_row
+    return formated_datetime, log_level, message
 
-# [TODO]: step 2
-# Update the get_dict function below so it converts a line of the logs into a
-# dictionary with keys for "timestamp", "log_level", and "message". The valid log
-# levels are `INFO`, `TRACE`, and `WARNING`. See lines 67 to 71 for how we expect the
-# results to look.
 def get_dict(line):
+    """checks sorted variables and assigns to dict"""
     row = line.split()
-    date_string = f"{row[0]} {row[1]}"
-    datetime_object = datetime.strptime(date_string, '%d/%m/%y %H:%M:%S')
-    formated_datetime = datetime_object.strftime('%d/%m/%y %H:%M:%S')
-    log_level = row[2]
-    message = " ".join(row[3:])
+    formated_datetime, log_level, message = formating(row)
     if log_level != INFO or log_level != TRACE or log_level != WARNING:
         print("Invalid log_level")
     data = {

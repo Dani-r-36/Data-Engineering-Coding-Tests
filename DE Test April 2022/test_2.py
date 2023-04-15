@@ -69,11 +69,6 @@
 # - the dx_number (if available) of the nearest court of the right type
 # - the distance to the nearest court of the right type
 
-#mysteps 
-#        - read csv file and format 
-#        - access api and get required details - test if i got what i want 
-#        - get required details from api
-#        - 
 from urllib.request import urlopen
 import json
 import os
@@ -81,7 +76,31 @@ import csv
 URL = "https://courttribunalfinder.service.gov.uk/search/results.json"
 CSV = "./people.csv"
 
+def csv_data_and_court_details():
+    """Gets CSV file and court details of person using 'helper functions'"""
+    csv_list = open_csv()
+    people_dict={}
+    for data in csv_list[1:]:
+        if len(data) != 3:
+            print("invalid CSV data in line")
+            continue
+        people_dict['name'] = data[0]
+        people_dict['postcode'] = data[1]
+        people_dict['court'] = data[2]
+        court_details = api_data(people_dict['postcode'])
+        courts = people_data(people_dict, court_details)
+        court = nearest_court(courts)
+        print(f"Name: {people_dict['name']}")
+        print(f"Type of court desired: {people_dict['court']}")
+        print(f"Home Postcode: {people_dict['postcode']}")
+        print(f"Nearest requested court: {court['name']}")
+        if "dx_number" in court:
+            print(f"Court DX number: {court['dx_number']}")
+        print(f"Distance to nearest court: {court['distance']}\n")
+
+
 def open_csv():
+    """Opens CSV file and returns in list format"""
     data_list = []
     if os.path.exists(CSV):
      with open(CSV) as csv_file:
@@ -90,24 +109,8 @@ def open_csv():
     else:
         raise Exception ("Invaild location for CSV")
 
-def get_csv_data():
-    csv_list = open_csv()
-    people_dict={}
-    for data in csv_list[1:]:
-        if len(data) != 3:
-            continue
-        people_dict['name'] = data[0]
-        people_dict['postcode'] = data[1]
-        people_dict['court'] = data[2]
-        court_details = api_data(people_dict['postcode'])
-    return people_dict, court_details
-
-def people_data(people_dict, court_details):
-    for courts in court_details:
-        if people_dict['court'] in courts['types']:
-            print(courts)
-
 def api_data(postcode):
+    """gets court details using API and postcode"""
     try:
         response = urlopen(f"{URL}?postcode={postcode}")
         data_json = json.loads(response.read())
@@ -116,8 +119,24 @@ def api_data(postcode):
         print(err)
         return("Invalid postcode")
 
+def people_data(people_dict, court_details):
+    """Finds matching requested court from person"""
+    list_courts =[]
+    for courts in court_details:
+        if people_dict['court'] in courts['types']:
+            list_courts.append(courts)
+    return list_courts
 
+def nearest_court(courts):
+    """returns closet matching court"""
+    distance = float(courts[0]['distance'])
+    nearest_court = []
+    for court in courts:
+        if distance > court['distance'] or distance == court['distance']:
+            distance = int(court['distance'])
+            nearest_court.append(court)
+    return nearest_court[-1]
 
 if __name__ == "__main__":
-    people_dict, details = get_csv_data()
-    people_data(people_dict, details)
+    print("\n Starting\n")
+    csv_data_and_court_details()
